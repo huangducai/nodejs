@@ -1,0 +1,6 @@
+{
+  "name": "assetsUpdate",
+  "bin": {
+    "assetsUpdate": "assetsUpdate.js"
+  }
+}

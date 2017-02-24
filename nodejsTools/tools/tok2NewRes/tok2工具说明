@@ -1,0 +1,146 @@
+//当前有用工具文件说明
+
+
+ios 全部流程
+1, 更新 cocosstudio 更改文件的路径 保证是正确的
+node tools/tok2NewRes/resetCocosStudio.js
+2, 输出cocosstudio的文件 拷贝到 client_res_test/ccsRes 全部覆盖
+
+
+3,执行 grunt  ihetu  对ios 实行 规则合图
+4,删除client_tp_res/ios/client_res/ccsRes 下得所有文件  执行 grunt hetu_i
+5, 拷贝 client_tp_res/ios/hetuhou 的文件 到 client_tp_res/ios/client_res/ccsRes/hetu 下 并删除原来的pvrccz
+6,[将client_tp_res/ios/client_res 整个目录 拷贝到 client_res_test(./res) 中]
+7, 执行 grunt json_png | json_pkm | json_pvr  重置 json配置
+
+
+
+
+
+
+
+
+
+resetCocosStudio.js 、、生成cocosstudio 的文件
+
+tok2CopyTools.js  拷贝 client——res 到单一目录  ios  和 android  资源压缩命令 在 gruntfile文件中
+
+resTosvnDir.js
+
+
+
+android
+
+步骤:
+
+
+images
+monster
+skeleton
+soldier
+soldierStaticImg
+ui
+
+客户端 res 结构
+pb
+config
+reportServer
+shader
+sound
+tiledMap
+updateConfig
+client_studio//里面新增的文件夹名称 待定
+        1-- hetu    //一张plist 对应一张 (png || pkm || pvrccz)  // ios  winphone  android  都会有类似的目录
+        -- Effect  //
+        -- CityMap //
+        ......
+
+目录说明
+    android::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    xuyaokaobei : 全等于 res
+    xiaotu : res 不需要合图的文件
+
+    hetuqian : res 下 所有的需要压缩的资源存放 单层目录 不可以是多层目录
+    hetuhou : hetuqian 用 tp 直接生成的大图
+    pkmPng : hetuhou 生成的 _alpha 图  和  _noAlpha 图 (包含 *.plist)
+    || 此处 请做 plist的资源拷贝
+    pkmRes : pkmPng 由tp 压缩png 生成的 pkm文件夹 (包含 *.plist)
+
+    client_res:的生成
+    1, 拷贝目录中所有的 不是 png jpg pkm pvrccz 的资源
+    2,拷贝不操作文件夹的数据 //全部拷贝
+
+    ios::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+      xuyaokaobei : 全等于 res
+      xiaotu : res 不需要合图的文件
+      hetuqian : res 下 所有的需要压缩的资源存放 单层目录 不可以是多层目录
+      hetuhou : hetuqian 用 tp 直接生成的大图  (张哥的压缩工具将会指向张哥文件夹)
+      pvrcczRes : 输出目录 仅仅是图片 是否包含plist ??
+      client_res: 的生成
+            1, 拷贝目录中所有的 不是 png jpg pkm pvrccz 的资源
+            2,拷贝不操作文件夹的数据 //全部拷贝
+
+---------------------------------------------- 我是万恶的分割线 ---------------------------------------------------------------------
+    android生成流程 :
+         定义不操作文件夹 数组 图片的名字 类似于这样 文件夹后面加个 "/" 就可以了
+            [
+                'Effect/', 'commonFrame/'
+            ]
+         //给定 输入目录(建议是svn的小图片完整目录)  输出目录(该目录是一个svn目录 即完整的 android 或者 ios资源目录 取下来能够直接打包的那种)
+         //0,完整拷贝输入目录到副本 工作路径->andorid->xuyaokaobei     //可以指定为svn的程序配置资源部分
+
+        //公共的部分开始
+         1,将所有的图片 png jpg  拷贝到安卓资源工作路径 ----->工作路径->andorid->hetuqian  //剔除不拷贝 操作的资源
+         //hetuqian 下面的所有图片都要进行合图
+         2,将这些资源进行合图  直接利用 tp工具进行合图  ----->工作路径->andorid->hetuhou  ---->生成完整的plist1 和 png1
+
+         //理论上 从这里可以转到6 去
+
+         //命名 由客户端决定 不用交给策划
+         3,生成 ****pkm_alpha.png   和 ****pkm.png  -----工作路径->andorid->pkmPng   ---->生成完整的plist2 和 png2
+         4,对3的结果 进行pkm转换  生成路径 工作路径->android->pkmRes  //建议同时拷贝plist2 和 png2
+         // (公用的才做) 5,将4生成的结果 输出到 输出目录 //建议同时拷贝plist2 和 png2
+         //公共的部分完毕
+
+         //以上步骤 全部不关心cocosstudio输出文件 后面会有专门的步骤来处理
+         6, 拷贝到 client_res
+             0, 拷贝 4[pkmRes] ——> client_res/hetu
+             1, 拷贝 源目录 所有的 不是 png jpg pkm pvrccz 的资源
+             2, 拷贝不操作文件夹的数据 //全部拷贝
+---------------------------------------------- 我是万恶的分割线 ---------------------------------------------------------------------
+
+ ios 生成流程
+     定义不操作文件夹 数组 图片的名字 类似于这样 文件夹后面加个 "/" 就可以了 单文件 请写全名字
+                [
+                    'Effect/', 'commonFrame/'
+                ]
+    0,1,2 跟 android 完全相同   //理论上 从这里可以转到4 去
+    3,对资源进行压缩 输出到目录【pvrcczRes】 《通过张哥的工具》
+
+    //4,将 pvrcczRes 的资源 拷贝到 输出目录 【公共的才需要】
+
+    5, 拷贝到 client_res ——> hetu
+             0, 拷贝 4[pvrcczRes] ——> client_res/hetu
+             1, 拷贝 源目录 所有的 不是 png jpg pkm pvrccz 的资源
+             2, 拷贝不操作文件夹的数据 //全部拷贝
+---------------------------------------------- 我是万恶的分割线 ---------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

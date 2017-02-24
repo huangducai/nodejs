@@ -1,0 +1,2 @@
+node scanAll.js
+pause
